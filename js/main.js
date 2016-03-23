@@ -55,7 +55,7 @@
 
     // ライトの生成
     var light = new THREE.DirectionalLight(0xffffff);
-    light.position.set(1, 1, 1);
+    light.position.set(10, 10, 10);
     light.castShadow = true;
     light.shadow.mapSize.width  = 4096;
     light.shadow.mapSize.height = 4096;
