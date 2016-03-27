@@ -5,14 +5,8 @@
     // レンダラを生成
     var renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    // renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
-
-    // window.addEventListener('resize', function () {
-    //     camera.aspect = window.innerWidth / window.innerHeight;
-    //     camera.updateProjectionMatrix();
-    //     renderer.setSize(window.innerWidth, window.innerHeight);
-    // }, false);
 
     document.body.appendChild(renderer.domElement);
 
