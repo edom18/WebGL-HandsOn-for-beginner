@@ -16,8 +16,42 @@
 
     document.body.appendChild(renderer.domElement);
 
+
+    //////////////////////////////////////////////////
+    // サブシーン
+
+    // レンダーターゲット
+    var width = 128;
+    var height = 128;
+
+    var renderTarget = new THREE.WebGLRenderTarget(width, height, {
+        magFilter: THREE.NearestFilter,
+        minFilter: THREE.NearestFilter,
+        wrapS: THREE.ClampToEdgeWrapping,
+        wrapT: THREE.ClampToEdgeWrapping
+    });
+
+    var subCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
+    subCamera.position.z = -2.49;
+    subCamera.position.y = 0.2;
+    subCamera.lookAt(new THREE.Vector3(0, 0, 0));
+
+    //////////////////////////////////////////////////
+
     // シーンを生成
     var scene = new THREE.Scene();
+
+    var p = new THREE.PlaneGeometry(1, 1);
+    var m = new THREE.MeshLambertMaterial({
+        map: renderTarget
+    });
+    var me = new THREE.Mesh(p, m);
+    me.position.z = -2.49;
+    me.position.y += 0.7;
+    me.scale.x = -1.0;
+    scene.add(me);
+
+
 
     // カメラを生成
     var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
@@ -55,13 +89,13 @@
 
     // ライトの生成
     var light = new THREE.DirectionalLight(0xffffff);
-    light.position.set(10, 10, 10);
+    light.position.set(10, 10, -10);
     light.castShadow = true;
     light.shadow.mapSize.width  = 4096;
     light.shadow.mapSize.height = 4096;
     scene.add(light);
 
-    var ambient = new THREE.AmbientLight(0x333333);
+    var ambient = new THREE.AmbientLight(0xeeeeee);
     scene.add(ambient);
 
 
@@ -107,6 +141,7 @@
 
     // アニメーションループ
     function animate(timestamp) {
+        renderer.render(scene, subCamera, renderTarget);
         renderer.render(scene, camera);
 
         // アニメーションループ
