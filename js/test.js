@@ -17,41 +17,9 @@
     document.body.appendChild(renderer.domElement);
 
 
-    //////////////////////////////////////////////////
-    // サブシーン
-
-    // レンダーターゲット
-    var width = 128;
-    var height = 128;
-
-    var renderTarget = new THREE.WebGLRenderTarget(width, height, {
-        magFilter: THREE.NearestFilter,
-        minFilter: THREE.NearestFilter,
-        wrapS: THREE.ClampToEdgeWrapping,
-        wrapT: THREE.ClampToEdgeWrapping
-    });
-
-    var subCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
-    subCamera.position.z = -2.49;
-    subCamera.position.y = 0.2;
-    subCamera.lookAt(new THREE.Vector3(0, 0, 0));
-
-    //////////////////////////////////////////////////
-
     // シーンを生成
     var scene = new THREE.Scene();
-
-    var p = new THREE.PlaneGeometry(1, 1);
-    var m = new THREE.MeshLambertMaterial({
-        map: renderTarget
-    });
-    var me = new THREE.Mesh(p, m);
-    me.position.z = -2.49;
-    me.position.y += 0.7;
-    me.scale.x = -1.0;
-    scene.add(me);
-
-
+    window.scene = scene;
 
     // カメラを生成
     var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
@@ -68,23 +36,14 @@
     var bedLoader = new THREE.JSONLoader();
     bedLoader.load('models/bed.json', function (geometry, materials) {
         var material = new THREE.MeshFaceMaterial(materials);
+        debugger;
+        material.transparent = false;
         var bed = new THREE.Mesh(geometry, material);
         var s = 0.5;
         bed.scale.set(s, s, s);
         bed.castShadow = true;
         bed.receiveShadow = true;
         scene.add(bed);
-    });
-
-    var tableLoader = new THREE.JSONLoader();
-    tableLoader.load('models/table.json', function (geometry, materials) {
-        var material = new THREE.MeshFaceMaterial(materials);
-        var table = new THREE.Mesh(geometry, material);
-        var s = 0.25;
-        table.scale.set(s, s, s);
-        table.position.x = 1.2;
-        table.castShadow = true;
-        scene.add(table);
     });
 
     // ライトの生成
@@ -99,49 +58,39 @@
     scene.add(ambient);
 
 
-    var floorTextureLoader = new THREE.TextureLoader();
-    floorTextureLoader.load('models/Sapele Mahogany.jpg', function (texture) {
+    var loader = new THREE.TextureLoader();
+    loader.load('models/Sapele Mahogany.jpg', function (texture) {
         texture.repeat.set(4, 4);
 
         var planeGeo = new THREE.PlaneGeometry(5, 5);
         var planeMat = new THREE.MeshLambertMaterial({
             color: 0xffffff,
-            map: texture
+            map: texture,
+            transparent: true
         });
         var plane = new THREE.Mesh(planeGeo, planeMat);
         plane.receiveShadow = true;
-        plane.rotation.x = -Math.PI / 2;
+        plane.rotation.y = Math.PI / 2;
+        plane.position.x = -2;
         scene.add(plane);
     });
 
-    var planeGeo = new THREE.PlaneGeometry(5, 2.5);
-    var planeMat = new THREE.MeshLambertMaterial({
-        color: 0xffffff
+    var tg = new THREE.SphereGeometry(1, 32, 32);
+    var tm = new THREE.MeshLambertMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.5,
+        map: loader.load('img/mapping-check.png'),
+        side: THREE.DoubleSide
     });
-    var plane = new THREE.Mesh(planeGeo, planeMat);
-    plane.position.z = -2.5;
-    plane.position.y = 1.25;
-    scene.add(plane);
-
-    var leftWall = plane.clone();
-    leftWall.position.z = 0;
-    leftWall.position.x = -2.5;
-    leftWall.rotation.y = Math.PI / 2;
-    scene.add(leftWall);
-
-    var rightWall = plane.clone();
-    rightWall.position.z = 0;
-    rightWall.position.x = 2.5;
-    rightWall.rotation.y = -Math.PI / 2;
-    scene.add(rightWall);
-
-
+    var tme = new THREE.Mesh(tg, tm);
+    tme.position.y = 1;
+    scene.add(tme);
 
     //////////////////////////////////////////////////
 
     // アニメーションループ
     function animate(timestamp) {
-        renderer.render(scene, subCamera, renderTarget);
         renderer.render(scene, camera);
 
         // アニメーションループ
